@@ -1,0 +1,7 @@
+group("default") {
+  testonly = true
+  deps = [
+    "//server:freerdp-server",
+    "//client:freerdp-client",
+  ]
+}

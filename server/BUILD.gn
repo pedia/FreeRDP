@@ -1,0 +1,193 @@
+executable("freerdp-server") {
+  defines = [
+    # "CHANNEL_AUDIN_SERVER",
+    "CHANNEL_RDPSND_SERVER",
+  ]
+  include_dirs = [
+    "//include",
+    "//winpr/include",
+  ]
+  sources = [
+    "Mac/mf_audin.c",
+    "Mac/mf_event.c",
+    "Mac/mf_info.c",
+    "Mac/mf_input.c",
+    "Mac/mf_interface.c",
+    "Mac/mf_mountain_lion.c",
+    "Mac/mf_peer.c",
+    "Mac/mf_rdpsnd.c",
+    "Mac/mfreerdp.c",
+    "common/server.c",
+  ]
+  deps = [
+    ":channels_server",
+    ":proxy",
+    ":rdtk",
+    ":shadow",
+  ]
+  lib_dirs = [
+    "//out/winpr/libwinpr",
+    "//out/libfreerdp",
+    "//out/client/common",
+  ]
+  libs = [
+    "winpr3",
+    "freerdp3",
+    "freerdp-client3",
+  ]
+
+  # DYLD_LIBRARY_PATH LD_LIBRARY_PATH
+  # DYLD_LIBRARY_PATH=out out/freerdp-server
+  ldflags = [
+    # "-Wl,-rpath=//out/winpr/libwinpr",
+    # "-Wl,-rpath //out/libfreerdp",
+    # "-Wl,-rpath //out/client/common",
+    # "-Wl,-rpath-link=",
+  ]
+  if (is_mac) {
+    # TODO:
+    # cflags = [ "-mmacosx-version-min=10.15" ]
+    # ldflags += [ "-mmacosx-version-min=10.15" ]
+
+    frameworks = [
+      "AudioToolbox.framework",
+      "Quartz.framework",
+      "IOSurface.framework",
+    ]
+  }
+}
+
+static_library("proxy") {
+  include_dirs = [
+    "//include",
+    "//winpr/include",
+    "proxy",
+    "proxy/modules",
+  ]
+  sources = [
+    # "proxy/freerdp_proxy.c", main
+    "proxy/modules/capture/cap_config.c",
+    "proxy/modules/capture/cap_main.c",
+    "proxy/modules/capture/cap_protocol.c",
+    "proxy/pf_channels.c",
+    "proxy/pf_client.c",
+    "proxy/pf_cliprdr.c",
+    "proxy/pf_config.c",
+    "proxy/pf_context.c",
+    "proxy/pf_disp.c",
+    "proxy/pf_gdi.c",
+    "proxy/pf_graphics.c",
+    "proxy/pf_input.c",
+    "proxy/pf_modules.c",
+    "proxy/pf_rail.c",
+    "proxy/pf_rdpgfx.c",
+    "proxy/pf_rdpsnd.c",
+    "proxy/pf_server.c",
+    "proxy/pf_update.c",
+  ]
+}
+
+static_library("shadow") {
+  include_dirs = [
+    "//include",
+    "//winpr/include",
+    "//rdtk/include",
+  ]
+  sources = [
+    "shadow/shadow.c",
+    "shadow/shadow_audin.c",
+    "shadow/shadow_capture.c",
+    "shadow/shadow_channels.c",
+    "shadow/shadow_client.c",
+    "shadow/shadow_encoder.c",
+    "shadow/shadow_encomsp.c",
+    "shadow/shadow_input.c",
+    "shadow/shadow_lobby.c",
+    "shadow/shadow_mcevent.c",
+    "shadow/shadow_rdpgfx.c",
+    "shadow/shadow_rdpsnd.c",
+    "shadow/shadow_remdesk.c",
+    "shadow/shadow_screen.c",
+    "shadow/shadow_server.c",
+    "shadow/shadow_subsystem.c",
+    "shadow/shadow_subsystem_builtin.c",
+    "shadow/shadow_surface.c",
+  ]
+  if (is_mac) {
+    sources += [ "shadow/Mac/mac_shadow.c" ]
+  }
+  if (is_linux) {
+    sources += [ "shadow/X11/x11_shadow.c" ]
+  }
+  if (is_win) {
+    sources += [
+      "shadow/Win/win_dxgi.c",
+      "shadow/Win/win_rdp.c",
+      "shadow/Win/win_shadow.c",
+      "shadow/Win/win_wds.c",
+    ]
+  }
+  defines = [ "HELLO_SHARED_IMPLEMENTATION" ]
+}
+
+static_library("channels_server") {
+  include_dirs = [
+    "//include",
+    "//winpr/include",
+    "//rdtk/include",
+    "//channels/cliprdr/server",
+    "//channels/rdpgfx/server",
+    "//channels/rdpgfx",
+    "//channels/rdpdr/server",
+    "//channels/rdpsnd/common",
+  ]
+  sources = [
+    "//channels/audin/server/audin.c",
+    "//channels/cliprdr/cliprdr_common.c",
+    "//channels/cliprdr/server/cliprdr_main.c",
+    "//channels/disp/disp_common.c",
+    "//channels/disp/server/disp_main.c",
+
+    # "//channels/drdynvc/server/drdynvc_main.c",
+    # "//channels/echo/server/echo_main.c",
+    "//channels/encomsp/server/encomsp_main.c",
+    "//channels/rail/rail_common.c",
+    "//channels/rail/server/rail_main.c",
+    "//channels/rdpdr/server/rdpdr_main.c",
+    "//channels/rdpei/rdpei_common.c",
+    "//channels/rdpei/server/rdpei_main.c",
+    "//channels/rdpgfx/rdpgfx_common.c",
+    "//channels/rdpgfx/server/rdpgfx_main.c",
+    "//channels/rdpsnd/server/rdpsnd_main.c",
+
+    # "//channels/remdesk/server/remdesk_main.c",
+    # "//channels/server/channels.c",
+    # "//channels/urbdrc/common/msusb.c",
+    # "//channels/urbdrc/common/urbdrc_helpers.c",
+  ]
+}
+
+# static_library("rdtk") {
+#   include_dirs = [
+#   ]
+#   sources = [
+#   ]
+# }
+
+static_library("rdtk") {
+  include_dirs = [
+    "//rdtk/include",
+    "//include",
+    "//winpr/include",
+  ]
+  sources = [
+    "//rdtk/librdtk/rdtk_button.c",
+    "//rdtk/librdtk/rdtk_engine.c",
+    "//rdtk/librdtk/rdtk_font.c",
+    "//rdtk/librdtk/rdtk_label.c",
+    "//rdtk/librdtk/rdtk_nine_patch.c",
+    "//rdtk/librdtk/rdtk_resources.c",
+    "//rdtk/librdtk/rdtk_surface.c",
+    "//rdtk/librdtk/rdtk_text_field.c",
+  ]
+}

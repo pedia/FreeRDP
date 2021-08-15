@@ -1,0 +1,37 @@
+executable("freerdp-client") {
+  include_dirs = [
+    "//include",
+    "//winpr/include",
+    "/usr/local/opt/openssl@1.1/include",
+  ]
+  lib_dirs = [
+    "//out/winpr/libwinpr",
+    "//out/libfreerdp",
+    "//out/client/common",
+  ]
+  libs = [
+    "winpr3",
+    "freerdp3",
+    "freerdp-client3",
+  ]
+  sources = [
+    "common/client.c",
+    "common/cmdline.c",
+    "common/compatibility.c",
+    "common/file.c",
+    "common/geometry.c",
+  ]
+
+  if (is_mac) {
+    sources += [
+      "Mac/CertificateDialog.m",
+      "Mac/Clipboard.m",
+      "Mac/Keyboard.m",
+      "Mac/MRDPCursor.m",
+      "Mac/MRDPView.m",
+      "Mac/PasswordDialog.m",
+      "Mac/main.m",
+      "Mac/mf_client.m",
+    ]
+  }
+}
